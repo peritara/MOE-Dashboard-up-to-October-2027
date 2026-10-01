@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MOE Financial Report & Budget Overview Dashboard</title>
+    <style>
+        :root {
+            --bg-color: #f4f6f9;
+            --card-bg: #ffffff;
+            --text-primary: #1a202c;
+            --text-secondary: #4a5568;
+            --primary: #1e3a8a;
+            --primary-light: #3b82f6;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --border: #e2e8f0;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+        body { background-color: var(--bg-color); color: var(--text-primary); padding: 24px; line-height: 1.5; }
+        
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; background: var(--card-bg); padding: 20px 24px; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .header h1 { font-size: 22px; color: var(--primary); font-weight: 700; }
+        .header p { font-size: 13px; color: var(--text-secondary); margin-top: 4px; }
+        
+        .filter-group { display: flex; align-items: center; gap: 12px; }
+        .filter-group label { font-size: 14px; font-weight: 600; color: var(--text-secondary); }
+        .filter-group select { padding: 8px 16px; border-radius: 8px; border: 1px solid var(--border); background-color: #fff; font-size: 14px; color: var(--text-primary); outline: none; cursor: pointer; }
+        .filter-group select:focus { border-color: var(--primary-light); }
+
+        .metrics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px; }
+        .metric-card { background: var(--card-bg); padding: 18px 20px; border-radius: 12px; border: 1px solid var(--border); box-shadow: 0 1px 2px rgba(0,0,0,0.03); }
+        .metric-card .title { font-size: 12px; font-weight: 600; text-transform: uppercase; color: var(--text-secondary); letter-spacing: 0.5px; }
+        .metric-card .value { font-size: 22px; font-weight: 700; color: var(--text-primary); margin-top: 8px; }
+        .metric-card .subtitle { font-size: 12px; margin-top: 6px; font-weight: 500; }
+        .subtitle.green { color: var(--success); }
+        .subtitle.amber { color: var(--warning); }
+        .subtitle.blue { color: var(--primary-light); }
+
+        .table-container { background: var(--card-bg); border-radius: 12px; border: 1px solid var(--border); overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .table-header { padding: 16px 20px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+        .table-header h2 { font-size: 16px; font-weight: 700; color: var(--primary); }
+        
+        table { width: 100%; border-collapse: collapse; text-align: left; font-size: 13px; }
+        th { background-color: #f8fafc; padding: 12px 16px; font-weight: 600; color: var(--text-secondary); border-bottom: 1px solid var(--border); }
+        td { padding: 12px 16px; border-bottom: 1px solid var(--border); color: var(--text-primary); }
+        tr:hover { background-color: #f8fafc; }
+        
+        .num { text-align: right; font-family: monospace, sans-serif; font-size: 13px; }
+        .badge { padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; display: inline-block; }
+        .badge-normal { background: #e0f2fe; color: #0369a1; }
+        .badge-warning { background: #fef3c7; color: #b45309; }
+        .badge-danger { background: #fee2e2; color: #b91c1c; }
+        
+        .progress-bar-bg { width: 100%; background: #e2e8f0; border-radius: 4px; height: 6px; overflow: hidden; margin-top: 4px; }
+        .progress-bar-fill { height: 100%; border-radius: 4px; }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <div>
+            <h1>MOE Financial Overview Dashboard</h1>
+            <p>Consolidated Divisional Budget Performance & Spend Tracker</p>
+        </div>
+        <div class="filter-group">
+            <label for="divisionFilter">Select View:</label>
+            <select id="divisionFilter" onchange="renderDashboard()">
+                <option value="ALL">ALL Divisions (Consolidated Summary)</option>
+                <option value="1501">1501 Administration</option>
+                <option value="1502">1502 Primary</option>
+                <option value="1503">1503 Junior Secondary Sch</option>
+                <option value="1504">1504 PPD & TR</option>
+                <option value="1505">1505 Teabike College</option>
+                <option value="1506">1506 KTC</option>
+                <option value="1507">1507 Exams</option>
+                <option value="1508">1508 CDRC</option>
+                <option value="1509">1509 Library & Archive</option>
+                <option value="1510">1510 SSS</option>
+                <option value="1511">1511 FMU</option>
+                <option value="1512">1512 Statistics & IT</option>
+                <option value="1513">1513 KGV&EBS</option>
+                <option value="1514">1514 KQA</option>
+                <option value="1515">1515 ECCE</option>
+                <option value="1516">1516 MOE-LPSSS</option>
+                <option value="9901">9901 National</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- Summary Metrics -->
+    <div class="metrics-grid">
+        <div class="metric-card">
+            <div class="title">Original Budget</div>
+            <div class="value" id="m-orig">$0.00</div>
+            <div class="subtitle blue">Approved Baseline</div>
+        </div>
+        <div class="metric-card">
+            <div class="title">Revised Budget</div>
+            <div class="value" id="m-rev">$0.00</div>
+            <div class="subtitle blue">Adjusted Allocation</div>
+        </div>
+        <div class="metric-card">
+            <div class="title">Actual Expenditure</div>
+            <div class="value" id="m-actual">$0.00</div>
+            <div class="subtitle green" id="m-actual-pct">0% of Revised</div>
+        </div>
+        <div class="metric-card">
+            <div class="title">Total Commitments (PO+PR)</div>
+            <div class="value" id="m-commit">$0.00</div>
+            <div class="subtitle amber">Encumbered Funds</div>
+        </div>
+        <div class="metric-card">
+            <div class="title">Available Balance</div>
+            <div class="value" id="m-bal">$0.00</div>
+            <div class="subtitle green" id="m-bal-pct">0% Remaining</div>
+        </div>
+    </div>
+
+    <!-- Main Table View -->
+    <div class="table-container">
+        <div class="table-header">
+            <h2 id="table-title">Consolidated Divisional Summary</h2>
+            <span id="record-count" style="font-size: 12px; color: var(--text-secondary);">Showing 0 items</span>
+        </div>
+        <table id="mainTable">
+            <thead id="tableHead">
+                <!-- Injected dynamically -->
+            </thead>
+            <tbody id="tableBody">
+                <!-- Injected dynamically -->
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        // Executive Divisional Totals
+        const summaryData = [
+            { divCode: "1501", division: "1501 Administration", orig: 20026386.45, rev: 23010162.07, actual: 14783481.02, commit: 604482.08, bal: 7622198.97 },
+            { divCode: "15074", division: "15074 Development of ESSP Plan", orig: 0.00, rev: 175532.99, actual: 118453.51, commit: 550.00, bal: 56529.48 },
+            { divCode: "1502", division: "1502 Primary", orig: 19578168.76, rev: 19578168.76, actual: 14894528.25, commit: 19746.13, bal: 4663894.38 },
+            { divCode: "1503", division: "1503 Junior Secondary Sch", orig: 12189715.58, rev: 12189715.58, actual: 9239618.53, commit: 8858.95, bal: 2941238.10 },
+            { divCode: "1504", division: "1504 PPD & TR", orig: 200457.83, rev: 200457.83, actual: 129997.93, commit: 6331.00, bal: 64128.90 },
+            { divCode: "1505", division: "1505 Teabike College", orig: 1588977.45, rev: 1588977.45, actual: 1168851.39, commit: 5604.93, bal: 414521.13 },
+            { divCode: "1506", division: "1506 KTC", orig: 2558387.60, rev: 2558387.60, actual: 1737674.33, commit: 32225.63, bal: 788487.64 },
+            { divCode: "1507", division: "1507 Exams", orig: 13362915.72, rev: 13362693.72, actual: 553822.72, commit: 65799.34, bal: 12743071.66 },
+            { divCode: "1508", division: "1508 CDRC", orig: 13505634.28, rev: 15669140.81, actual: 13219144.32, commit: 33158.48, bal: 2416838.01 },
+            { divCode: "1509", division: "1509 Library & Archive", orig: 601354.51, rev: 601354.51, actual: 357857.60, commit: 21752.69, bal: 221744.22 },
+            { divCode: "1510", division: "1510 SSS", orig: 4251648.75, rev: 4251648.75, actual: 3108788.25, commit: 2756.25, bal: 1140104.25 },
+            { divCode: "1511", division: "1511 FMU", orig: 713324.00, rev: 1233316.13, actual: 436749.63, commit: 8792.63, bal: 787773.87 },
+            { divCode: "1512", division: "1512 Statistics & IT", orig: 275592.00, rev: 275592.00, actual: 116974.05, commit: 8085.02, bal: 150532.93 },
+            { divCode: "1513", division: "1513 KGV&EBS", orig: 2755290.23, rev: 2755290.23, actual: 2028298.57, commit: 34971.05, bal: 692020.61 },
+            { divCode: "1514", division: "1514 KQA", orig: 63059.80, rev: 63059.80, actual: 31296.26, commit: 0.00, bal: 31763.54 },
+            { divCode: "1515", division: "1515 ECCE", orig: 679174.12, rev: 745986.22, actual: 550243.19, commit: 968.00, bal: 194775.03 },
+            { divCode: "1516", division: "1516 MOE-LPSSS", orig: 882684.97, rev: 882684.97, actual: 519622.70, commit: 6403.85, bal: 356658.42 },
+            { divCode: "9901", division: "9901 National", orig: 0.00, rev: 41165.00, actual: 16280.84, commit: 0.00, bal: 24884.16 }
+        ];
+
+        // Detailed Coding Blocks Sample Data for 1501
+        const lineItems1501 = [
+            { code: "211111", desc: "Base Salary - Local Personnel", orig: 12450000.00, rev: 14200000.00, actual: 10850000.00, commit: 0.00, bal: 3350000.00 },
+            { code: "221112", desc: "Council Services - Local", orig: 0.00, rev: 96.00, actual: 96.00, commit: 0.00, bal: 0.00 },
+            { code: "222101", desc: "Office Supplies & Materials", orig: 85000.00, rev: 110000.00, actual: 78500.00, commit: 12400.00, bal: 19100.00 },
+            { code: "224105", desc: "Electricity & Utilities", orig: 310000.00, rev: 350000.00, actual: 295000.00, commit: 42000.00, bal: 13000.00 },
+            { code: "227112", desc: "Fuel", orig: 0.00, rev: 10428.89, actual: 0.00, commit: 0.00, bal: 10428.89 },
+            { code: "227213", desc: "Int. Travel - Misc Incidental", orig: 0.00, rev: 3234.00, actual: 360.00, commit: 0.00, bal: 2874.00 }
+        ];
+
+        function fmt(num) {
+            return '$' + num.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        }
+
+        function renderDashboard() {
+            const filter = document.getElementById('divisionFilter').value;
+            const thead = document.getElementById('tableHead');
+            const tbody = document.getElementById('tableBody');
+            const titleEl = document.getElementById('table-title');
+
+            if (filter === 'ALL') {
+                titleEl.innerText = "Consolidated Divisional Summary";
+                
+                thead.innerHTML = `
+                    <tr>
+                        <th>Division Name</th>
+                        <th class="num">Original Budget</th>
+                        <th class="num">Revised Budget</th>
+                        <th class="num">Actual Spend</th>
+                        <th class="num">Commitments</th>
+                        <th class="num">Total Spend</th>
+                        <th class="num">Available Balance</th>
+                        <th style="width: 140px; text-align: center;">Utilization</th>
+                        <th style="text-align: center;">Status Flag</th>
+                    </tr>
+                `;
+
+                // Calculate Totals
+                const totOrig = summaryData.reduce((a, b) => a + b.orig, 0);
+                const totRev = summaryData.reduce((a, b) => a + b.rev, 0);
+                const totActual = summaryData.reduce((a, b) => a + b.actual, 0);
+                const totCommit = summaryData.reduce((a, b) => a + b.commit, 0);
+                const totBal = summaryData.reduce((a, b) => a + b.bal, 0);
+
+                updateMetrics(totOrig, totRev, totActual, totCommit, totBal);
+
+                tbody.innerHTML = '';
+                summaryData.forEach(item => {
+                    const totalSpend = item.actual + item.commit;
+                    const util = item.rev > 0 ? (totalSpend / item.rev * 100) : 0;
+                    let badgeClass = util > 90 ? "badge-danger" : (util < 40 && item.rev > 0 ? "badge-warning" : "badge-normal");
+                    let flagText = util > 90 ? "High Spend (>90%)" : (util < 40 && item.rev > 0 ? "Low Spend (<40%)" : "On Track");
+                    let barColor = util > 90 ? "#ef4444" : (util < 40 && item.rev > 0 ? "#f59e0b" : "#3b82f6");
+
+                    tbody.innerHTML += `
+                        <tr>
+                            <td style="font-weight: 600;">${item.division}</td>
+                            <td class="num">${fmt(item.orig)}</td>
+                            <td class="num">${fmt(item.rev)}</td>
+                            <td class="num" style="color: #059669;">${fmt(item.actual)}</td>
+                            <td class="num" style="color: #d97706;">${fmt(item.commit)}</td>
+                            <td class="num" style="font-weight: 600;">${fmt(totalSpend)}</td>
+                            <td class="num" style="font-weight: 600; color: #2563eb;">${fmt(item.bal)}</td>
+                            <td style="text-align: center;">
+                                <div style="font-weight: 600; font-size: 12px;">${util.toFixed(1)}%</div>
+                                <div class="progress-bar-bg"><div class="progress-bar-fill" style="width: ${Math.min(util, 100)}%; background-color: ${barColor};"></div></div>
+                            </td>
+                            <td style="text-align: center;"><span class="badge ${badgeClass}">${flagText}</span></td>
+                        </tr>
+                    `;
+                });
+                document.getElementById('record-count').innerText = `Showing ${summaryData.length} division(s)`;
+
+            } else {
+                // Individual Division View
+                const selectedDiv = summaryData.find(d => d.divCode === filter);
+                titleEl.innerText = `Detailed Line Item Ledger — ${selectedDiv ? selectedDiv.division : filter}`;
+
+                thead.innerHTML = `
+                    <tr>
+                        <th style="width: 100px;">Code</th>
+                        <th>Account Description</th>
+                        <th class="num">Original Budget</th>
+                        <th class="num">Revised Budget</th>
+                        <th class="num">Actual Spend</th>
+                        <th class="num">Commitments</th>
+                        <th class="num">Available Balance</th>
+                        <th style="width: 120px; text-align: center;">Utilization</th>
+                        <th style="text-align: center;">Status</th>
+                    </tr>
+                `;
+
+                if (selectedDiv) {
+                    updateMetrics(selectedDiv.orig, selectedDiv.rev, selectedDiv.actual, selectedDiv.commit, selectedDiv.bal);
+                }
+
+                tbody.innerHTML = '';
+                const itemsToDisplay = filter === '1501' ? lineItems1501 : [];
+
+                if (itemsToDisplay.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="9" style="text-align: center; padding: 20px; color: #718096;">Showing primary coding blocks for Division ${filter}. Totals are reflected in cards above.</td></tr>`;
+                } else {
+                    itemsToDisplay.forEach(item => {
+                        const totalSpend = item.actual + item.commit;
+                        const util = item.rev > 0 ? (totalSpend / item.rev * 100) : 0;
+                        let badgeClass = util > 90 ? "badge-danger" : (util < 40 && item.rev > 0 ? "badge-warning" : "badge-normal");
+                        let flagText = util > 90 ? "High Spend" : (util < 40 && item.rev > 0 ? "Low Spend" : "On Track");
+
+                        tbody.innerHTML += `
+                            <tr>
+                                <td style="font-family: monospace; font-weight: 600;">${item.code}</td>
+                                <td style="font-weight: 500;">${item.desc}</td>
+                                <td class="num">${fmt(item.orig)}</td>
+                                <td class="num">${fmt(item.rev)}</td>
+                                <td class="num" style="color: #059669;">${fmt(item.actual)}</td>
+                                <td class="num" style="color: #d97706;">${fmt(item.commit)}</td>
+                                <td class="num" style="font-weight: 600; color: #2563eb;">${fmt(item.bal)}</td>
+                                <td style="text-align: center; font-weight: 600;">${util.toFixed(1)}%</td>
+                                <td style="text-align: center;"><span class="badge ${badgeClass}">${flagText}</span></td>
+                            </tr>
+                        `;
+                    });
+                }
+                document.getElementById('record-count').innerText = `Showing ${itemsToDisplay.length} coding block item(s)`;
+            }
+        }
+
+        function updateMetrics(orig, rev, actual, commit, bal) {
+            document.getElementById('m-orig').innerText = fmt(orig);
+            document.getElementById('m-rev').innerText = fmt(rev);
+            document.getElementById('m-actual').innerText = fmt(actual);
+            document.getElementById('m-actual-pct').innerText = `${((actual / (rev || 1)) * 100).toFixed(1)}% of Revised Budget`;
+            document.getElementById('m-commit').innerText = fmt(commit);
+            document.getElementById('m-bal').innerText = fmt(bal);
+            document.getElementById('m-bal-pct').innerText = `${((bal / (rev || 1)) * 100).toFixed(1)}% Available`;
+        }
+
+        renderDashboard();
+    </script>
+</body>
+</html>
