@@ -3,143 +3,303 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MOE Financial Report & Budget Overview Dashboard</title>
+    <title>MINISTRY OF EDUCATION, KIRIBATI - IFMIS Budget Overview</title>
     <style>
         :root {
-            --bg-color: #f4f6f9;
+            --bg-body: #f1f5f9;
+            --header-bg: #003B7A;
             --card-bg: #ffffff;
-            --text-primary: #1a202c;
-            --text-secondary: #4a5568;
-            --primary: #1e3a8a;
-            --primary-light: #3b82f6;
-            --success: #10b981;
-            --warning: #f59e0b;
-            --danger: #ef4444;
-            --border: #e2e8f0;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border-color: #cbd5e1;
+            --accent-yellow: #ffcc00;
+            --primary-blue: #003B7A;
+            --pill-active-bg: #002654;
+            --pill-active-text: #ffffff;
+            --badge-green-bg: #dcfce7;
+            --badge-green-text: #166534;
+            --badge-amber-bg: #fef3c7;
+            --badge-amber-text: #92400e;
+            --badge-red-bg: #fee2e2;
+            --badge-red-text: #991b1b;
+        }
+
+        body.dark-mode {
+            --bg-body: #0f172a;
+            --header-bg: #0284c7;
+            --card-bg: #1e293b;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border-color: #334155;
+            --pill-active-bg: #38bdf8;
+            --pill-active-text: #0f172a;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-        body { background-color: var(--bg-color); color: var(--text-primary); padding: 24px; line-height: 1.5; }
-        
-        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; background: var(--card-bg); padding: 20px 24px; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
-        .header h1 { font-size: 22px; color: var(--primary); font-weight: 700; }
-        .header p { font-size: 13px; color: var(--text-secondary); margin-top: 4px; }
-        
-        .filter-group { display: flex; align-items: center; gap: 12px; }
-        .filter-group label { font-size: 14px; font-weight: 600; color: var(--text-secondary); }
-        .filter-group select { padding: 8px 16px; border-radius: 8px; border: 1px solid var(--border); background-color: #fff; font-size: 14px; color: var(--text-primary); outline: none; cursor: pointer; }
-        .filter-group select:focus { border-color: var(--primary-light); }
+        body { background-color: var(--bg-body); color: var(--text-main); padding: 16px; transition: background 0.2s, color 0.2s; }
 
-        .metrics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px; }
-        .metric-card { background: var(--card-bg); padding: 18px 20px; border-radius: 12px; border: 1px solid var(--border); box-shadow: 0 1px 2px rgba(0,0,0,0.03); }
-        .metric-card .title { font-size: 12px; font-weight: 600; text-transform: uppercase; color: var(--text-secondary); letter-spacing: 0.5px; }
-        .metric-card .value { font-size: 22px; font-weight: 700; color: var(--text-primary); margin-top: 8px; }
-        .metric-card .subtitle { font-size: 12px; margin-top: 6px; font-weight: 500; }
-        .subtitle.green { color: var(--success); }
-        .subtitle.amber { color: var(--warning); }
-        .subtitle.blue { color: var(--primary-light); }
+        /* Header Styling */
+        .header-banner {
+            background: var(--header-bg);
+            color: #ffffff;
+            padding: 20px 28px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+            margin-bottom: 20px;
+            border-bottom: 5px solid var(--accent-yellow);
+        }
 
-        .table-container { background: var(--card-bg); border-radius: 12px; border: 1px solid var(--border); overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
-        .table-header { padding: 16px 20px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
-        .table-header h2 { font-size: 16px; font-weight: 700; color: var(--primary); }
-        
-        table { width: 100%; border-collapse: collapse; text-align: left; font-size: 13px; }
-        th { background-color: #f8fafc; padding: 12px 16px; font-weight: 600; color: var(--text-secondary); border-bottom: 1px solid var(--border); }
-        td { padding: 12px 16px; border-bottom: 1px solid var(--border); color: var(--text-primary); }
-        tr:hover { background-color: #f8fafc; }
-        
-        .num { text-align: right; font-family: monospace, sans-serif; font-size: 13px; }
-        .badge { padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; display: inline-block; }
-        .badge-normal { background: #e0f2fe; color: #0369a1; }
-        .badge-warning { background: #fef3c7; color: #b45309; }
-        .badge-danger { background: #fee2e2; color: #b91c1c; }
-        
-        .progress-bar-bg { width: 100%; background: #e2e8f0; border-radius: 4px; height: 6px; overflow: hidden; margin-top: 4px; }
-        .progress-bar-fill { height: 100%; border-radius: 4px; }
+        .header-left { display: flex; align-items: center; gap: 20px; }
+        .logo-circle {
+            width: 72px; height: 72px; border-radius: 50%;
+            border: 3px solid var(--accent-yellow);
+            background: rgba(255,255,255,0.1);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 11px; font-weight: bold; text-align: center; color: #fff;
+            overflow: hidden;
+        }
+        .logo-circle img { width: 100%; height: 100%; object-fit: cover; }
+
+        .header-titles h1 { font-size: 26px; font-weight: 800; letter-spacing: 0.5px; text-transform: uppercase; }
+        .header-titles p { font-size: 14px; font-style: italic; opacity: 0.9; margin-top: 4px; color: var(--accent-yellow); }
+
+        .header-actions { display: flex; align-items: center; gap: 12px; }
+        .btn-header {
+            padding: 10px 18px; border-radius: 10px; font-weight: 700; font-size: 13px;
+            cursor: pointer; border: none; display: flex; align-items: center; gap: 8px; transition: all 0.2s;
+        }
+        .btn-dark { background: rgba(255,255,255,0.15); color: #fff; border: 1px solid rgba(255,255,255,0.3); }
+        .btn-dark:hover { background: rgba(255,255,255,0.25); }
+        .btn-export { background: var(--accent-yellow); color: #000; }
+        .btn-export:hover { background: #e6b800; }
+
+        /* Filter Control Box */
+        .filter-card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 20px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+            margin-bottom: 20px;
+        }
+
+        .filter-top-row { display: flex; gap: 16px; margin-bottom: 16px; flex-wrap: wrap; }
+        .search-box { flex: 1; min-width: 300px; position: relative; }
+        .search-box input {
+            width: 100%; padding: 12px 16px 12px 42px; border-radius: 10px;
+            border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-main);
+            font-size: 14px; outline: none;
+        }
+        .search-icon { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--text-muted); font-size: 16px; }
+
+        .view-switcher {
+            display: flex; background: #e2e8f0; border-radius: 10px; padding: 4px; gap: 4px;
+        }
+        body.dark-mode .view-switcher { background: #334155; }
+        .view-btn {
+            padding: 8px 16px; border-radius: 8px; font-size: 13px; font-weight: 700;
+            border: none; cursor: pointer; color: var(--text-muted); background: transparent; transition: all 0.2s;
+            display: flex; align-items: center; gap: 6px;
+        }
+        .view-btn.active { background: var(--pill-active-bg); color: var(--pill-active-text); box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+
+        .filter-dropdowns { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)) 120px; gap: 12px; align-items: end; }
+        .field-group { display: flex; flex-direction: column; gap: 6px; }
+        .field-group label { font-size: 11px; font-weight: 800; text-transform: uppercase; color: var(--text-muted); letter-spacing: 0.5px; }
+        .field-group select {
+            padding: 10px 12px; border-radius: 8px; border: 1px solid var(--border-color);
+            background: var(--card-bg); color: var(--text-main); font-size: 13px; outline: none; cursor: pointer;
+        }
+        .btn-reset {
+            padding: 10px; border-radius: 8px; border: 1px solid var(--border-color);
+            background: #e2e8f0; color: var(--text-main); font-weight: 700; font-size: 13px; cursor: pointer;
+        }
+        body.dark-mode .btn-reset { background: #334155; }
+
+        /* KPI Cards */
+        .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 20px; }
+        .kpi-card {
+            background: var(--card-bg); padding: 18px; border-radius: 14px;
+            border: 1px solid var(--border-color); box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+        }
+        .kpi-title { font-size: 12px; font-weight: 700; text-transform: uppercase; color: var(--text-muted); }
+        .kpi-value { font-size: 22px; font-weight: 800; margin-top: 8px; color: var(--text-main); }
+        .kpi-sub { font-size: 12px; margin-top: 4px; font-weight: 600; }
+
+        /* Table Area */
+        .table-card {
+            background: var(--card-bg); border-radius: 16px; border: 1px solid var(--border-color);
+            overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        }
+        .table-header-bar {
+            padding: 16px 20px; border-bottom: 1px solid var(--border-color);
+            display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.02);
+        }
+        .table-header-bar h2 { font-size: 16px; font-weight: 800; color: var(--primary-blue); }
+        body.dark-mode .table-header-bar h2 { color: #38bdf8; }
+
+        table { width: 100%; border-collapse: collapse; font-size: 13px; text-align: left; }
+        th { background: rgba(0,0,0,0.03); padding: 12px 16px; font-weight: 700; color: var(--text-muted); border-bottom: 1px solid var(--border-color); }
+        td { padding: 12px 16px; border-bottom: 1px solid var(--border-color); color: var(--text-main); }
+        tr:hover { background: rgba(0,0,0,0.025); }
+
+        .num { text-align: right; font-family: monospace, monospace; font-size: 13px; }
+        .badge { padding: 4px 10px; border-radius: 12px; font-size: 11px; font-weight: 700; display: inline-block; }
+        .badge-normal { background: var(--badge-green-bg); color: var(--badge-green-text); }
+        .badge-warning { background: var(--badge-amber-bg); color: var(--badge-amber-text); }
+        .badge-danger { background: var(--badge-red-bg); color: var(--badge-red-text); }
+
+        .bar-bg { width: 100%; background: #e2e8f0; height: 6px; border-radius: 3px; overflow: hidden; margin-top: 4px; }
+        body.dark-mode .bar-bg { background: #334155; }
+        .bar-fill { height: 100%; border-radius: 3px; }
     </style>
 </head>
 <body>
 
-    <div class="header">
-        <div>
-            <h1>MOE Financial Overview Dashboard</h1>
-            <p>Consolidated Divisional Budget Performance & Spend Tracker</p>
+    <!-- Header Banner -->
+    <div class="header-banner">
+        <div class="header-left">
+            <div class="logo-circle">
+                <img src="MOE logo.jpg" alt="MOE" onerror="this.style.display='none'; this.parentNode.innerText='MOE LOGO';">
+            </div>
+            <div class="header-titles">
+                <h1>MINISTRY OF EDUCATION, KIRIBATI</h1>
+                <p>IFMIS Budget Overview & Financial Expenditure Report — 01/10/2026</p>
+            </div>
         </div>
-        <div class="filter-group">
-            <label for="divisionFilter">Select View:</label>
-            <select id="divisionFilter" onchange="renderDashboard()">
-                <option value="ALL">ALL Divisions (Consolidated Summary)</option>
-                <option value="1501">1501 Administration</option>
-                <option value="1502">1502 Primary</option>
-                <option value="1503">1503 Junior Secondary Sch</option>
-                <option value="1504">1504 PPD & TR</option>
-                <option value="1505">1505 Teabike College</option>
-                <option value="1506">1506 KTC</option>
-                <option value="1507">1507 Exams</option>
-                <option value="1508">1508 CDRC</option>
-                <option value="1509">1509 Library & Archive</option>
-                <option value="1510">1510 SSS</option>
-                <option value="1511">1511 FMU</option>
-                <option value="1512">1512 Statistics & IT</option>
-                <option value="1513">1513 KGV&EBS</option>
-                <option value="1514">1514 KQA</option>
-                <option value="1515">1515 ECCE</option>
-                <option value="1516">1516 MOE-LPSSS</option>
-                <option value="9901">9901 National</option>
-            </select>
+        <div class="header-actions">
+            <button class="btn-header btn-dark" onclick="toggleDarkMode()">
+                <span id="dark-icon">🌙</span> <span id="dark-text">Dark Mode</span>
+            </button>
+            <button class="btn-header btn-export" onclick="exportToCSV()">
+                📄 Export CSV
+            </button>
         </div>
     </div>
 
-    <!-- Summary Metrics -->
-    <div class="metrics-grid">
-        <div class="metric-card">
-            <div class="title">Original Budget</div>
-            <div class="value" id="m-orig">$0.00</div>
-            <div class="subtitle blue">Approved Baseline</div>
+    <!-- Filter Control Box -->
+    <div class="filter-card">
+        <div class="filter-top-row">
+            <div class="search-box">
+                <span class="search-icon">🔍</span>
+                <input type="text" id="searchInput" placeholder="Search by Coding Block Code, Description, Division, Fund Source..." oninput="applyFilters()">
+            </div>
+            <div class="view-switcher">
+                <button class="view-btn active" id="btnConsolidated" onclick="setViewMode('consolidated')">
+                    🌿 Consolidated View
+                </button>
+                <button class="view-btn" id="btnLedger" onclick="setViewMode('ledger')">
+                    📜 Detailed Ledger
+                </button>
+            </div>
         </div>
-        <div class="metric-card">
-            <div class="title">Revised Budget</div>
-            <div class="value" id="m-rev">$0.00</div>
-            <div class="subtitle blue">Adjusted Allocation</div>
-        </div>
-        <div class="metric-card">
-            <div class="title">Actual Expenditure</div>
-            <div class="value" id="m-actual">$0.00</div>
-            <div class="subtitle green" id="m-actual-pct">0% of Revised</div>
-        </div>
-        <div class="metric-card">
-            <div class="title">Total Commitments (PO+PR)</div>
-            <div class="value" id="m-commit">$0.00</div>
-            <div class="subtitle amber">Encumbered Funds</div>
-        </div>
-        <div class="metric-card">
-            <div class="title">Available Balance</div>
-            <div class="value" id="m-bal">$0.00</div>
-            <div class="subtitle green" id="m-bal-pct">0% Remaining</div>
+
+        <div class="filter-dropdowns">
+            <div class="field-group">
+                <label>DIVISION</label>
+                <select id="filterDivision" onchange="applyFilters()">
+                    <option value="ALL">ALL Divisions (Consolidated)</option>
+                    <option value="1501 Administration">1501 Administration</option>
+                    <option value="1502 Primary">1502 Primary</option>
+                    <option value="1503 Junior Secondary Sch">1503 Junior Secondary Sch</option>
+                    <option value="1504 PPD & TR">1504 PPD & TR</option>
+                    <option value="1505 Teabike College">1505 Teabike College</option>
+                    <option value="1506 KTC">1506 KTC</option>
+                    <option value="1507 Exams">1507 Exams</option>
+                    <option value="1508 CDRC">1508 CDRC</option>
+                    <option value="1509 Library & Archive">1509 Library & Archive</option>
+                    <option value="1510 SSS">1510 SSS</option>
+                    <option value="1511 FMU">1511 FMU</option>
+                    <option value="1512 Statistics & IT">1512 Statistics & IT</option>
+                    <option value="1513 KGV&EBS">1513 KGV&EBS</option>
+                    <option value="1514 KQA">1514 KQA</option>
+                    <option value="1515 ECCE">1515 ECCE</option>
+                    <option value="1516 MOE-LPSSS">1516 MOE-LPSSS</option>
+                    <option value="15074 Development of ESSP Plan">15074 Development of ESSP Plan</option>
+                    <option value="9901 National">9901 National</option>
+                </select>
+            </div>
+            <div class="field-group">
+                <label>SOURCE OF FUND</label>
+                <select id="filterFund" onchange="applyFilters()">
+                    <option value="ALL">All Funding Sources (12 ALL)</option>
+                    <option value="Government">Government of Kiribati</option>
+                    <option value="Development">Development Partners / Grants</option>
+                </select>
+            </div>
+            <div class="field-group">
+                <label>BUDGET CATEGORY</label>
+                <select id="filterCategory" onchange="applyFilters()">
+                    <option value="ALL">All Budget Categories</option>
+                    <option value="Personnel">Personnel (21xxxx)</option>
+                    <option value="Operational">Operational Expenses (22xxxx)</option>
+                    <option value="Capital">Capital / Asset (3xxxx)</option>
+                </select>
+            </div>
+            <div class="field-group">
+                <label>ATTENTION STATUS</label>
+                <select id="filterStatus" onchange="applyFilters()">
+                    <option value="ALL">All Statuses</option>
+                    <option value="On Track">On Track (40% - 90%)</option>
+                    <option value="Low Spend">Low Spend (<40%)</option>
+                    <option value="High Spend">High Spend (>90%)</option>
+                </select>
+            </div>
+            <button class="btn-reset" onclick="resetFilters()">🔄 Reset All</button>
         </div>
     </div>
 
-    <!-- Main Table View -->
-    <div class="table-container">
-        <div class="table-header">
+    <!-- KPI Summary Grid -->
+    <div class="kpi-grid">
+        <div class="kpi-card">
+            <div class="kpi-title">Original Budget</div>
+            <div class="kpi-value" id="kpi-orig">$0.00</div>
+            <div class="kpi-sub" style="color: #0284c7;">Approved Allocation</div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-title">Revised Budget</div>
+            <div class="kpi-value" id="kpi-rev">$0.00</div>
+            <div class="kpi-sub" style="color: #0284c7;">Adjusted Allocation</div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-title">Actual Spend</div>
+            <div class="kpi-value" id="kpi-actual">$0.00</div>
+            <div class="kpi-sub" id="kpi-actual-sub" style="color: #16a34a;">0% of Revised</div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-title">Commitments (PO+PR)</div>
+            <div class="kpi-value" id="kpi-commit">$0.00</div>
+            <div class="kpi-sub" style="color: #d97706;">Encumbered Funds</div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-title">Available Balance</div>
+            <div class="kpi-value" id="kpi-bal">$0.00</div>
+            <div class="kpi-sub" id="kpi-bal-sub" style="color: #2563eb;">0% Available</div>
+        </div>
+    </div>
+
+    <!-- Main Table Container -->
+    <div class="table-card">
+        <div class="table-header-bar">
             <h2 id="table-title">Consolidated Divisional Summary</h2>
-            <span id="record-count" style="font-size: 12px; color: var(--text-secondary);">Showing 0 items</span>
+            <span id="record-count" style="font-size: 12px; color: var(--text-muted);">Showing 0 items</span>
         </div>
         <table id="mainTable">
-            <thead id="tableHead">
-                <!-- Injected dynamically -->
-            </thead>
-            <tbody id="tableBody">
-                <!-- Injected dynamically -->
-            </tbody>
+            <thead id="tableHead"></thead>
+            <tbody id="tableBody"></tbody>
         </table>
     </div>
 
     <script>
-        // Executive Divisional Totals
+        // State
+        let currentMode = 'consolidated'; // 'consolidated' or 'ledger'
+
+        // 18 Divisional Summaries from Financial Report
         const summaryData = [
             { divCode: "1501", division: "1501 Administration", orig: 20026386.45, rev: 23010162.07, actual: 14783481.02, commit: 604482.08, bal: 7622198.97 },
-            { divCode: "15074", division: "15074 Development of ESSP Plan", orig: 0.00, rev: 175532.99, actual: 118453.51, commit: 550.00, bal: 56529.48 },
             { divCode: "1502", division: "1502 Primary", orig: 19578168.76, rev: 19578168.76, actual: 14894528.25, commit: 19746.13, bal: 4663894.38 },
             { divCode: "1503", division: "1503 Junior Secondary Sch", orig: 12189715.58, rev: 12189715.58, actual: 9239618.53, commit: 8858.95, bal: 2941238.10 },
             { divCode: "1504", division: "1504 PPD & TR", orig: 200457.83, rev: 200457.83, actual: 129997.93, commit: 6331.00, bal: 64128.90 },
@@ -155,33 +315,64 @@
             { divCode: "1514", division: "1514 KQA", orig: 63059.80, rev: 63059.80, actual: 31296.26, commit: 0.00, bal: 31763.54 },
             { divCode: "1515", division: "1515 ECCE", orig: 679174.12, rev: 745986.22, actual: 550243.19, commit: 968.00, bal: 194775.03 },
             { divCode: "1516", division: "1516 MOE-LPSSS", orig: 882684.97, rev: 882684.97, actual: 519622.70, commit: 6403.85, bal: 356658.42 },
+            { divCode: "15074", division: "15074 Development of ESSP Plan", orig: 0.00, rev: 175532.99, actual: 118453.51, commit: 550.00, bal: 56529.48 },
             { divCode: "9901", division: "9901 National", orig: 0.00, rev: 41165.00, actual: 16280.84, commit: 0.00, bal: 24884.16 }
         ];
 
-        // Detailed Coding Blocks Sample Data for 1501
-        const lineItems1501 = [
-            { code: "211111", desc: "Base Salary - Local Personnel", orig: 12450000.00, rev: 14200000.00, actual: 10850000.00, commit: 0.00, bal: 3350000.00 },
-            { code: "221112", desc: "Council Services - Local", orig: 0.00, rev: 96.00, actual: 96.00, commit: 0.00, bal: 0.00 },
-            { code: "222101", desc: "Office Supplies & Materials", orig: 85000.00, rev: 110000.00, actual: 78500.00, commit: 12400.00, bal: 19100.00 },
-            { code: "224105", desc: "Electricity & Utilities", orig: 310000.00, rev: 350000.00, actual: 295000.00, commit: 42000.00, bal: 13000.00 },
-            { code: "227112", desc: "Fuel", orig: 0.00, rev: 10428.89, actual: 0.00, commit: 0.00, bal: 10428.89 },
-            { code: "227213", desc: "Int. Travel - Misc Incidental", orig: 0.00, rev: 3234.00, actual: 360.00, commit: 0.00, bal: 2874.00 }
+        // Key Detailed Line Item Coding Blocks Sample Data
+        const ledgerData = [
+            { code: "211111", desc: "Base Salary - Local Personnel", division: "1501 Administration", orig: 12450000, rev: 14200000, actual: 10850000, commit: 0, bal: 3350000 },
+            { code: "221112", desc: "Council Services - Local", division: "1501 Administration", orig: 0, rev: 96, actual: 96, commit: 0, bal: 0 },
+            { code: "222101", desc: "Office Supplies & Materials", division: "1501 Administration", orig: 85000, rev: 110000, actual: 78500, commit: 12400, bal: 19100 },
+            { code: "224105", desc: "Electricity & Utilities", division: "1501 Administration", orig: 310000, rev: 350000, actual: 295000, commit: 42000, bal: 13000 },
+            { code: "227112", desc: "Fuel", division: "1501 Administration", orig: 0, rev: 10428.89, actual: 0, commit: 0, bal: 10428.89 },
+            { code: "227213", desc: "Int. Travel - Misc Incidental", division: "1501 Administration", orig: 0, rev: 3234, actual: 360, commit: 0, bal: 2874 },
+            { code: "211111", desc: "Base Salary - Teachers", division: "1502 Primary", orig: 15400000, rev: 15400000, actual: 12100000, commit: 0, bal: 3300000 },
+            { code: "222102", desc: "Primary Curriculum Materials", division: "1502 Primary", orig: 450000, rev: 450000, actual: 310000, commit: 15000, bal: 125000 },
+            { code: "211111", desc: "Base Salary - JSS Teachers", division: "1503 Junior Secondary Sch", orig: 9800000, rev: 9800000, actual: 7600000, commit: 0, bal: 2200000 },
+            { code: "224101", desc: "School Maintenance & Repairs", division: "1503 Junior Secondary Sch", orig: 600000, rev: 600000, actual: 420000, commit: 8858.95, bal: 171141.05 },
+            { code: "225101", desc: "National Examination Printing", division: "1507 Exams", orig: 8500000, rev: 8500000, actual: 250000, commit: 65799.34, bal: 8184200.66 }
         ];
 
-        function fmt(num) {
-            return '$' + num.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        function fmt(n) {
+            return '$' + n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
         }
 
-        function renderDashboard() {
-            const filter = document.getElementById('divisionFilter').value;
-            const thead = document.getElementById('tableHead');
-            const tbody = document.getElementById('tableBody');
-            const titleEl = document.getElementById('table-title');
+        function setViewMode(mode) {
+            currentMode = mode;
+            document.getElementById('btnConsolidated').classList.toggle('active', mode === 'consolidated');
+            document.getElementById('btnLedger').classList.toggle('active', mode === 'ledger');
+            applyFilters();
+        }
 
-            if (filter === 'ALL') {
-                titleEl.innerText = "Consolidated Divisional Summary";
-                
-                thead.innerHTML = `
+        function toggleDarkMode() {
+            document.body.classList.toggle('dark-mode');
+            const isDark = document.body.classList.contains('dark-mode');
+            document.getElementById('dark-icon').innerText = isDark ? '☀️' : '🌙';
+            document.getElementById('dark-text').innerText = isDark ? 'Light Mode' : 'Dark Mode';
+        }
+
+        function resetFilters() {
+            document.getElementById('searchInput').value = '';
+            document.getElementById('filterDivision').value = 'ALL';
+            document.getElementById('filterFund').value = 'ALL';
+            document.getElementById('filterCategory').value = 'ALL';
+            document.getElementById('filterStatus').value = 'ALL';
+            applyFilters();
+        }
+
+        function applyFilters() {
+            const query = document.getElementById('searchInput').value.toLowerCase().trim();
+            const divFilter = document.getElementById('filterDivision').value;
+            const statusFilter = document.getElementById('filterStatus').value;
+
+            const tableHead = document.getElementById('tableHead');
+            const tableBody = document.getElementById('tableBody');
+            const tableTitle = document.getElementById('table-title');
+
+            if (currentMode === 'consolidated' && divFilter === 'ALL') {
+                tableTitle.innerText = "Consolidated Divisional Summary";
+                tableHead.innerHTML = `
                     <tr>
                         <th>Division Name</th>
                         <th class="num">Original Budget</th>
@@ -190,112 +381,141 @@
                         <th class="num">Commitments</th>
                         <th class="num">Total Spend</th>
                         <th class="num">Available Balance</th>
-                        <th style="width: 140px; text-align: center;">Utilization</th>
+                        <th style="width: 130px; text-align: center;">Utilization</th>
                         <th style="text-align: center;">Status Flag</th>
                     </tr>
                 `;
 
-                // Calculate Totals
-                const totOrig = summaryData.reduce((a, b) => a + b.orig, 0);
-                const totRev = summaryData.reduce((a, b) => a + b.rev, 0);
-                const totActual = summaryData.reduce((a, b) => a + b.actual, 0);
-                const totCommit = summaryData.reduce((a, b) => a + b.commit, 0);
-                const totBal = summaryData.reduce((a, b) => a + b.bal, 0);
+                let filtered = summaryData.filter(d => {
+                    const matchQ = d.division.toLowerCase().includes(query) || d.divCode.includes(query);
+                    const totalSpend = d.actual + d.commit;
+                    const util = d.rev > 0 ? (totalSpend / d.rev * 100) : 0;
+                    let status = util > 90 ? "High Spend" : (util < 40 && d.rev > 0 ? "Low Spend" : "On Track");
+                    const matchS = statusFilter === 'ALL' || statusFilter === status;
+                    return matchQ && matchS;
+                });
 
-                updateMetrics(totOrig, totRev, totActual, totCommit, totBal);
+                updateKPIs(filtered);
 
-                tbody.innerHTML = '';
-                summaryData.forEach(item => {
-                    const totalSpend = item.actual + item.commit;
-                    const util = item.rev > 0 ? (totalSpend / item.rev * 100) : 0;
-                    let badgeClass = util > 90 ? "badge-danger" : (util < 40 && item.rev > 0 ? "badge-warning" : "badge-normal");
-                    let flagText = util > 90 ? "High Spend (>90%)" : (util < 40 && item.rev > 0 ? "Low Spend (<40%)" : "On Track");
-                    let barColor = util > 90 ? "#ef4444" : (util < 40 && item.rev > 0 ? "#f59e0b" : "#3b82f6");
+                tableBody.innerHTML = '';
+                filtered.forEach(d => {
+                    const totalSpend = d.actual + d.commit;
+                    const util = d.rev > 0 ? (totalSpend / d.rev * 100) : 0;
+                    let badgeClass = util > 90 ? "badge-danger" : (util < 40 && d.rev > 0 ? "badge-warning" : "badge-normal");
+                    let flagText = util > 90 ? "High Spend (>90%)" : (util < 40 && d.rev > 0 ? "Low Spend (<40%)" : "On Track");
+                    let barColor = util > 90 ? "#ef4444" : (util < 40 && d.rev > 0 ? "#f59e0b" : "#3b82f6");
 
-                    tbody.innerHTML += `
+                    tableBody.innerHTML += `
                         <tr>
-                            <td style="font-weight: 600;">${item.division}</td>
-                            <td class="num">${fmt(item.orig)}</td>
-                            <td class="num">${fmt(item.rev)}</td>
-                            <td class="num" style="color: #059669;">${fmt(item.actual)}</td>
-                            <td class="num" style="color: #d97706;">${fmt(item.commit)}</td>
-                            <td class="num" style="font-weight: 600;">${fmt(totalSpend)}</td>
-                            <td class="num" style="font-weight: 600; color: #2563eb;">${fmt(item.bal)}</td>
+                            <td style="font-weight: 700;">${d.division}</td>
+                            <td class="num">${fmt(d.orig)}</td>
+                            <td class="num">${fmt(d.rev)}</td>
+                            <td class="num" style="color: #16a34a;">${fmt(d.actual)}</td>
+                            <td class="num" style="color: #d97706;">${fmt(d.commit)}</td>
+                            <td class="num" style="font-weight: 700;">${fmt(totalSpend)}</td>
+                            <td class="num" style="font-weight: 700; color: #2563eb;">${fmt(d.bal)}</td>
                             <td style="text-align: center;">
-                                <div style="font-weight: 600; font-size: 12px;">${util.toFixed(1)}%</div>
-                                <div class="progress-bar-bg"><div class="progress-bar-fill" style="width: ${Math.min(util, 100)}%; background-color: ${barColor};"></div></div>
+                                <div style="font-weight: 700; font-size: 11px;">${util.toFixed(1)}%</div>
+                                <div class="bar-bg"><div class="bar-fill" style="width: ${Math.min(util, 100)}%; background: ${barColor};"></div></div>
                             </td>
                             <td style="text-align: center;"><span class="badge ${badgeClass}">${flagText}</span></td>
                         </tr>
                     `;
                 });
-                document.getElementById('record-count').innerText = `Showing ${summaryData.length} division(s)`;
+                document.getElementById('record-count').innerText = `Showing ${filtered.length} division(s)`;
 
             } else {
-                // Individual Division View
-                const selectedDiv = summaryData.find(d => d.divCode === filter);
-                titleEl.innerText = `Detailed Line Item Ledger — ${selectedDiv ? selectedDiv.division : filter}`;
-
-                thead.innerHTML = `
+                // Detailed Ledger View OR Single Division View
+                tableTitle.innerText = divFilter !== 'ALL' ? `Detailed Ledger — ${divFilter}` : "Detailed Coding Block Ledger";
+                tableHead.innerHTML = `
                     <tr>
-                        <th style="width: 100px;">Code</th>
+                        <th style="width: 90px;">Code</th>
                         <th>Account Description</th>
+                        <th>Division</th>
                         <th class="num">Original Budget</th>
                         <th class="num">Revised Budget</th>
                         <th class="num">Actual Spend</th>
                         <th class="num">Commitments</th>
                         <th class="num">Available Balance</th>
-                        <th style="width: 120px; text-align: center;">Utilization</th>
+                        <th style="width: 100px; text-align: center;">Utilization</th>
                         <th style="text-align: center;">Status</th>
                     </tr>
                 `;
 
-                if (selectedDiv) {
-                    updateMetrics(selectedDiv.orig, selectedDiv.rev, selectedDiv.actual, selectedDiv.commit, selectedDiv.bal);
-                }
+                let filtered = ledgerData.filter(item => {
+                    const matchQ = item.code.includes(query) || item.desc.toLowerCase().includes(query) || item.division.toLowerCase().includes(query);
+                    const matchD = divFilter === 'ALL' || item.division.includes(divFilter.split(' ')[0]);
+                    const totalSpend = item.actual + item.commit;
+                    const util = item.rev > 0 ? (totalSpend / item.rev * 100) : 0;
+                    let status = util > 90 ? "High Spend" : (util < 40 && item.rev > 0 ? "Low Spend" : "On Track");
+                    const matchS = statusFilter === 'ALL' || statusFilter === status;
+                    return matchQ && matchD && matchS;
+                });
 
-                tbody.innerHTML = '';
-                const itemsToDisplay = filter === '1501' ? lineItems1501 : [];
+                updateKPIs(filtered);
 
-                if (itemsToDisplay.length === 0) {
-                    tbody.innerHTML = `<tr><td colspan="9" style="text-align: center; padding: 20px; color: #718096;">Showing primary coding blocks for Division ${filter}. Totals are reflected in cards above.</td></tr>`;
+                tableBody.innerHTML = '';
+                if (filtered.length === 0) {
+                    tableBody.innerHTML = `<tr><td colspan="10" style="text-align: center; padding: 24px; color: var(--text-muted);">No matching line item ledger records found.</td></tr>`;
                 } else {
-                    itemsToDisplay.forEach(item => {
+                    filtered.forEach(item => {
                         const totalSpend = item.actual + item.commit;
                         const util = item.rev > 0 ? (totalSpend / item.rev * 100) : 0;
                         let badgeClass = util > 90 ? "badge-danger" : (util < 40 && item.rev > 0 ? "badge-warning" : "badge-normal");
                         let flagText = util > 90 ? "High Spend" : (util < 40 && item.rev > 0 ? "Low Spend" : "On Track");
 
-                        tbody.innerHTML += `
+                        tableBody.innerHTML += `
                             <tr>
-                                <td style="font-family: monospace; font-weight: 600;">${item.code}</td>
-                                <td style="font-weight: 500;">${item.desc}</td>
+                                <td style="font-family: monospace; font-weight: 700;">${item.code}</td>
+                                <td style="font-weight: 600;">${item.desc}</td>
+                                <td style="font-size: 12px; color: var(--text-muted);">${item.division}</td>
                                 <td class="num">${fmt(item.orig)}</td>
                                 <td class="num">${fmt(item.rev)}</td>
-                                <td class="num" style="color: #059669;">${fmt(item.actual)}</td>
+                                <td class="num" style="color: #16a34a;">${fmt(item.actual)}</td>
                                 <td class="num" style="color: #d97706;">${fmt(item.commit)}</td>
-                                <td class="num" style="font-weight: 600; color: #2563eb;">${fmt(item.bal)}</td>
-                                <td style="text-align: center; font-weight: 600;">${util.toFixed(1)}%</td>
+                                <td class="num" style="font-weight: 700; color: #2563eb;">${fmt(item.bal)}</td>
+                                <td style="text-align: center; font-weight: 700;">${util.toFixed(1)}%</td>
                                 <td style="text-align: center;"><span class="badge ${badgeClass}">${flagText}</span></td>
                             </tr>
                         `;
                     });
                 }
-                document.getElementById('record-count').innerText = `Showing ${itemsToDisplay.length} coding block item(s)`;
+                document.getElementById('record-count').innerText = `Showing ${filtered.length} coding block item(s)`;
             }
         }
 
-        function updateMetrics(orig, rev, actual, commit, bal) {
-            document.getElementById('m-orig').innerText = fmt(orig);
-            document.getElementById('m-rev').innerText = fmt(rev);
-            document.getElementById('m-actual').innerText = fmt(actual);
-            document.getElementById('m-actual-pct').innerText = `${((actual / (rev || 1)) * 100).toFixed(1)}% of Revised Budget`;
-            document.getElementById('m-commit').innerText = fmt(commit);
-            document.getElementById('m-bal').innerText = fmt(bal);
-            document.getElementById('m-bal-pct').innerText = `${((bal / (rev || 1)) * 100).toFixed(1)}% Available`;
+        function updateKPIs(items) {
+            const totOrig = items.reduce((a, b) => a + b.orig, 0);
+            const totRev = items.reduce((a, b) => a + b.rev, 0);
+            const totActual = items.reduce((a, b) => a + b.actual, 0);
+            const totCommit = items.reduce((a, b) => a + b.commit, 0);
+            const totBal = items.reduce((a, b) => a + b.bal, 0);
+
+            document.getElementById('kpi-orig').innerText = fmt(totOrig);
+            document.getElementById('kpi-rev').innerText = fmt(totRev);
+            document.getElementById('kpi-actual').innerText = fmt(totActual);
+            document.getElementById('kpi-actual-sub').innerText = `${((totActual / (totRev || 1)) * 100).toFixed(1)}% of Revised`;
+            document.getElementById('kpi-commit').innerText = fmt(totCommit);
+            document.getElementById('kpi-bal').innerText = fmt(totBal);
+            document.getElementById('kpi-bal-sub').innerText = `${((totBal / (totRev || 1)) * 100).toFixed(1)}% Available`;
         }
 
-        renderDashboard();
+        function exportToCSV() {
+            let csv = "Code/Division,Description,Original Budget,Revised Budget,Actual Spend,Commitments,Available Balance\n";
+            const data = currentMode === 'consolidated' ? summaryData : ledgerData;
+            data.forEach(d => {
+                csv += `"${d.division || d.code}","${d.desc || ''}",${d.orig},${d.rev},${d.actual},${d.commit},${d.bal}\n`;
+            });
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.setAttribute('href', url);
+            a.setAttribute('download', `MOE_Financial_Report_${currentMode}.csv`);
+            a.click();
+        }
+
+        // Initialize
+        applyFilters();
     </script>
 </body>
 </html>
